@@ -1,37 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.input';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  private users = [
-    {
-      id: 1,
-      username: 'ramil',
-      password: '$2b$10$eOL26F4M0aRhpuexFQcEDOBDMt9BcIvrRBujWELgIDcF3X3.3039m',
-    },
-    {
-      id: 2,
-      username: 'maria',
-      password: '$2b$10$eOL26F4M0aRhpuexFQcEDOBDMt9BcIvrRBujWELgIDcF3X3.3039m',
-    },
-  ];
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
 
-  create(createUserInput: CreateUserInput) {
-    const user = {
-      ...createUserInput,
-      id: this.users.length + 1,
-    };
+  async create(createUserInput: CreateUserInput): Promise<User> {
+    const user = this.userRepository.create(createUserInput);
 
-    this.users.push(user);
+    return this.userRepository.save(user);
+  }
 
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
+  }
+
+  async findOne(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({ username });
+    if (!user) {
+      throw new NotFoundException();
+    }
     return user;
   }
 
-  findAll() {
-    return this.users;
-  }
-
-  findOne(username: string) {
-    return this.users.find((user) => user.username === username);
+  async findByUsername(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({ username });
+    return user;
   }
 }

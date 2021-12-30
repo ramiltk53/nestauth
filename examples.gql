@@ -1,0 +1,42 @@
+#signup 1
+mutation {
+  signup(signupUserInput: {username:"ramil", password:"12345678"}){
+    username,
+    id
+  }
+}
+
+#signup 2
+mutation {
+  signup(signupUserInput: {username:"maria", password:"12345678"}){
+    username,
+    id
+  }
+}
+
+#signin 1
+mutation {
+  login(loginUserInput: {username:"ramil", password:"12345678"}){
+    user {
+      username
+    }
+    access_token
+  }
+}
+
+# Get all users. Need Http header  {"Authorization" : "Bearer <access_token>"} . Token token lives 300ss
+{
+  users {
+    username,
+    id,
+  }
+}
+
+# Get one user. available to everybody without token
+
+query {
+  user(username: "ramil") {
+    username,
+    id,
+  }
+}
